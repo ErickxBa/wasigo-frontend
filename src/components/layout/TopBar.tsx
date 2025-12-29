@@ -58,7 +58,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
       <div className="flex items-center gap-3">
         {/* Rating display */}
-        {user && (
+        {user && user.calificacion !== undefined && (
           <div className="hidden sm:flex items-center gap-1 px-3 py-1.5 bg-(--accent) rounded-lg">
             <Star className="w-4 h-4 text-(--warning) fill-(--warning)" />
             <span className="font-semibold text-sm">{user.calificacion.toFixed(1)}</span>
