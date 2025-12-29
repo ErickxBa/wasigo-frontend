@@ -1,34 +1,62 @@
-import { Suspense } from 'react';
+'use client';
+
+import { useEffect, useState } from 'react';
 import { DriverHomeContent } from '@/components/driver/DriverHomeContent';
 import { DriverHomeSkeleton } from '@/components/common/SkeletonLoaders';
-import { ClientOnly } from '@/components/common/ClientOnly';
 import { obtenerRutasActivas, obtenerEstadisticasConductor } from '@/lib/driverData';
+import type { Ruta } from '@/data/mockData';
 
-export const dynamic = 'force-dynamic';
-
-async function DriverHomeData() {
-  const conductorId = '2'; // En producción vendría del contexto de auth
-  const rutasActivas = await obtenerRutasActivas(conductorId);
-  const estadisticas = await obtenerEstadisticasConductor(conductorId);
-
-  const stats = {
-    rutasActivas: estadisticas.rutasActivas,
-    viajesCompletados: estadisticas.viajesCompletados,
-    fondosDisponibles: estadisticas.disponible,
-    calificacion: estadisticas.calificacion
-  };
-
-  return (
-    <ClientOnly fallback={<DriverHomeSkeleton />}>
-      <DriverHomeContent rutasActivas={rutasActivas} stats={stats} />
-    </ClientOnly>
-  );
+interface DriverStats {
+  rutasActivas: number;
+  viajesCompletados: number;
+  fondosDisponibles: number;
+  calificacion: number;
 }
 
-export default async function HomePage() {
-  return (
-    <Suspense fallback={<DriverHomeSkeleton />}>
-      <DriverHomeData />
-    </Suspense>
-  );
+export default function HomePage() {
+  const [rutasActivas, setRutasActivas] = useState<Ruta[]>([]);
+  const [stats, setStats] = useState<DriverStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const cargarDatos = async () => {
+      try {
+        setIsLoading(true);
+        const conductorId = '2'; // En producción vendría del contexto de auth
+        const [rutas, estadisticas] = await Promise.all([
+          obtenerRutasActivas(conductorId),
+          obtenerEstadisticasConductor(conductorId),
+        ]);
+
+        setRutasActivas(rutas);
+        setStats({
+          rutasActivas: estadisticas.rutasActivas,
+          viajesCompletados: estadisticas.viajesCompletados,
+          fondosDisponibles: estadisticas.disponible,
+          calificacion: estadisticas.calificacion
+        });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Error al cargar datos');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    cargarDatos();
+  }, []);
+
+  if (isLoading) {
+    return <DriverHomeSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 text-center">
+        <p className="text-red-600">Error: {error}</p>
+      </div>
+    );
+  }
+
+  return <DriverHomeContent rutasActivas={rutasActivas} stats={stats!} />;
 }

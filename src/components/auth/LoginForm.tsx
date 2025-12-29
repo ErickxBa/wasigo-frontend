@@ -7,7 +7,7 @@ import { Button, Input, Label } from '@/components';
 import { Mail, Lock, Eye, EyeOff, AlertCircle, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import ForgotPasswordModal from './ForgotPasswordModal';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -15,6 +15,7 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
 
   const { setAuth } = useAuth();
   const router = useRouter();
@@ -53,12 +54,16 @@ export default function LoginForm() {
         
         // Redirigir según el rol
         const rol = response.data.user.rol?.toLowerCase();
+        console.log('User role:', rol);
+        
         if (rol === 'conductor') {
           router.push('/driver/dashboard');
         } else if (rol === 'pasajero') {
           router.push('/passenger/dashboard');
         } else {
-          router.push('/dashboard');
+          // Por defecto, ir a passenger si no se reconoce el rol
+          console.warn('Unknown role:', response.data.user.rol, 'defaulting to passenger');
+          router.push('/passenger/dashboard');
         }
       }
     } catch (err: any) {
@@ -114,9 +119,13 @@ export default function LoginForm() {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="password">Contraseña</Label>
-          <Link href="/recuperar" className="text-sm text-(--primary) hover:underline">
+          <button
+            type="button"
+            onClick={() => setShowForgotPasswordModal(true)}
+            className="text-sm text-(--primary) hover:underline"
+          >
             ¿Olvidaste tu contraseña?
-          </Link>
+          </button>
         </div>
         <div className="relative">
           <Input
@@ -148,6 +157,11 @@ export default function LoginForm() {
         {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
         {!loading && <ArrowRight className="w-5 h-5" />}
       </Button>
+
+      <ForgotPasswordModal 
+        open={showForgotPasswordModal} 
+        onOpenChange={setShowForgotPasswordModal}
+      />
     </form>
   );
 }

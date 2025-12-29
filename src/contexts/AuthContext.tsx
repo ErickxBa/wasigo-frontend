@@ -184,13 +184,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const restoreSession = async () => {
       try {
+        console.log('[AuthContext] Intentando restaurar sesión...');
         const token = authService.getToken();
+        console.log('[AuthContext] Token:', token ? 'exists' : 'no existe');
+        console.log('[AuthContext] isAuthenticated:', authService.isAuthenticated());
+        
         if (token && authService.isAuthenticated()) {
-          // Token existe, asumir que el usuario está autenticado
-          // Podrías hacer una llamada a un endpoint de "me" para obtener datos actuales
-          // Por ahora mantenemos el token activo
+          // Token existe, restaurar datos del usuario desde localStorage
+          const storedUserData = localStorage.getItem('user_data');
+          console.log('[AuthContext] storedUserData:', storedUserData ? 'exists' : 'no existe');
+          
+          if (storedUserData) {
+            try {
+              const parsedUser = JSON.parse(storedUserData);
+              console.log('[AuthContext] Usuario restaurado:', parsedUser.email);
+              setUser(parsedUser);
+              setRequiresVerification(parsedUser.estadoVerificacion !== 'VERIFICADO');
+            } catch (e) {
+              console.log('[AuthContext] Error parseando localStorage:', e);
+              // localStorage corrupto, limpiar
+              localStorage.removeItem('user_data');
+            }
+          }
+        } else {
+          console.log('[AuthContext] No hay token válido, sesión vacía');
         }
       } finally {
+        console.log('[AuthContext] RestoreSession finalizado');
         setIsLoading(false);
       }
     };
@@ -201,10 +221,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
+      console.log('[AuthContext] Iniciando login...');
       const response = await authService.login({ email, password });
 
       if (response.error) {
-        console.error('Login error:', response.error);
+        console.error('[AuthContext] Login error:', response.error);
         return false;
       }
 
@@ -212,21 +233,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const { access_token, user: backendUser } = response.data;
 
         // Guardar token
+        console.log('[AuthContext] Guardando token...');
         authService.setToken(access_token);
 
         // Convertir y guardar usuario
         const localUser = convertBackendUserToLocalUser(backendUser);
         setUser(localUser);
+        
+        // Guardar user_data en localStorage
+        console.log('[AuthContext] Guardando user_data en localStorage...');
+        localStorage.setItem('user_data', JSON.stringify(localUser));
 
         // Verificar si requiere verificación
         setRequiresVerification(backendUser.estadoVerificacion !== 'VERIFICADO');
 
+        console.log('[AuthContext] Login exitoso para:', email);
         return true;
       }
 
       return false;
     } catch (error) {
-      console.error('Login exception:', error);
+      console.error('[AuthContext] Login exception:', error);
       return false;
     } finally {
       setIsLoading(false);
@@ -239,6 +266,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       await authService.logout();
       setUser(null);
       setRequiresVerification(false);
+      // Limpiar datos del usuario de localStorage
+      localStorage.removeItem('user_data');
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -300,6 +329,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // Convertir y guardar usuario
     const localUser = convertBackendUserToLocalUser(data.user);
     setUser(localUser);
+
+    // Guardar datos del usuario en localStorage para persistencia
+    localStorage.setItem('user_data', JSON.stringify(localUser));
 
     // Verificar si requiere verificación
     setRequiresVerification(data.user.estadoVerificacion !== 'VERIFICADO');
