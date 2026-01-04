@@ -52,19 +52,33 @@ export default function LoginForm() {
 
         toast.success('¡Bienvenido a WasiGo!');
         
-        // Redirigir según el rol
+        // Determinar redirección según rol y estado de verificación
         const rol = response.data.user.rol?.toLowerCase();
-        console.log('User role:', rol);
+        const estadoVerificacion = response.data.user.estadoVerificacion?.toUpperCase();
         
-        if (rol === 'conductor') {
-          router.push('/driver/dashboard');
-        } else if (rol === 'pasajero') {
-          router.push('/passenger/dashboard');
-        } else {
-          // Por defecto, ir a passenger si no se reconoce el rol
-          console.warn('Unknown role:', response.data.user.rol, 'defaulting to passenger');
-          router.push('/passenger/dashboard');
-        }
+        console.log('[LoginForm] User:', { 
+          rol, 
+          estadoVerificacion,
+          email: response.data.user.email 
+        });
+        
+        // Lógica de redirección:
+        // 1. Si NO está verificado → Ir a verificación
+        // 2. Si está verificado → Dashboard general (donde acepta solicitudes de viaje)
+        // 3. Una vez sea pasajero/conductor → accede a sus dashboards respectivos
+        
+        // Usar setTimeout para asegurar que el estado se actualice antes de redirigir
+        setTimeout(() => {
+          if (estadoVerificacion !== 'VERIFICADO') {
+            // Usuario no verificado → Ir a página de verificación
+            console.log('[LoginForm] Usuario no verificado, redirigiendo a verificación');
+            router.push('/verification');
+          } else {
+            // Usuario verificado → Ir al home (dashboard del conductor)
+            console.log('[LoginForm] Usuario verificado, redirigiendo a home');
+            router.push('/home');
+          }
+        }, 100);
       }
     } catch (err: any) {
       let errorMessage = 'Credenciales incorrectas. Intenta nuevamente.';

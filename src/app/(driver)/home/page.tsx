@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 import { DriverHomeContent } from '@/components/driver/DriverHomeContent';
 import { DriverHomeSkeleton } from '@/components/common/SkeletonLoaders';
 import { obtenerRutasActivas, obtenerEstadisticasConductor } from '@/lib/driverData';
@@ -14,10 +16,19 @@ interface DriverStats {
 }
 
 export default function HomePage() {
+  const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
+  const router = useRouter();
   const [rutasActivas, setRutasActivas] = useState<Ruta[]>([]);
   const [stats, setStats] = useState<DriverStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Redirigir si no está autenticado
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -46,7 +57,7 @@ export default function HomePage() {
     cargarDatos();
   }, []);
 
-  if (isLoading) {
+  if (authLoading || isLoading) {
     return <DriverHomeSkeleton />;
   }
 
@@ -58,5 +69,12 @@ export default function HomePage() {
     );
   }
 
-  return <DriverHomeContent rutasActivas={rutasActivas} stats={stats!} />;
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Main Content - Integrated with TopBar */}
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+        <DriverHomeContent rutasActivas={rutasActivas} stats={stats!} />
+      </div>
+    </div>
+  );
 }

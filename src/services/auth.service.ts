@@ -11,6 +11,7 @@ export interface RegisterData {
   email: string;
   celular: string;
   password: string;
+  confirmPassword: string;
 }
 
 export interface ForgotPasswordRequest {

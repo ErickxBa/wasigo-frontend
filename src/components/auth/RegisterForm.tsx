@@ -72,7 +72,7 @@ export default function RegisterForm() {
     if (!/[a-z]/.test(password)) return 'Debe incluir una letra minúscula';
     if (!/[A-Z]/.test(password)) return 'Debe incluir una letra mayúscula';
     if (!/\d/.test(password)) return 'Debe incluir un número';
-    if (!/[^A-Za-z\d]/.test(password)) return 'Debe incluir un carácter especial';
+    if (!/[!@#$%^&*]/.test(password)) return 'Debe incluir un carácter especial (!@#$%^&*)';
     return null;
   };
 
@@ -148,12 +148,13 @@ export default function RegisterForm() {
         celular: formData.celular,
         email: formData.email,
         password: formData.password,
+        confirmPassword: formData.confirmPassword,
       });
 
       console.log('Register response:', response);
 
-      // La respuesta tiene estructura: { success: true, user: { id, ... } }
-      const userId = response.data?.user?.id;
+      // La respuesta tiene estructura: { success: true, data: { user: { id (publicId), ... } }, timestamp: ... }
+      const userId = response?.data?.user?.id;
 
       if (userId) {
         setUserId(userId);
