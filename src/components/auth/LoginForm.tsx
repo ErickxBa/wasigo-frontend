@@ -74,9 +74,9 @@ export default function LoginForm() {
             console.log('[LoginForm] Usuario no verificado, redirigiendo a verificación');
             router.push('/verification');
           } else {
-            // Usuario verificado → Ir al home (dashboard del conductor)
-            console.log('[LoginForm] Usuario verificado, redirigiendo a home');
-            router.push('/home');
+            // Usuario verificado → Ir al dashboard general
+            console.log('[LoginForm] Usuario verificado, redirigiendo a dashboard');
+            router.push('/dashboard');
           }
         }, 100);
       }
