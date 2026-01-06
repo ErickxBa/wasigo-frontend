@@ -1,3 +1,7 @@
+// DESHABILITADO TEMPORALMENTE - Falta dependencia @react-google-maps/api
+// TODO: Instalar: npm install @react-google-maps/api
+
+/*
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -265,8 +269,7 @@ export default function RouteTrackingMap({ routeId, userType }: RouteTrackingMap
         {directions && <DirectionsRenderer directions={directions} />}
       </GoogleMap>
 
-      {/* Botón flotante para centrar en ubicación */}
-      {userLocation && (
+      {/* Botón flotante para centrar en ubicación * / }
         <button
           onClick={centerOnUser}
           className="absolute bottom-24 right-4 bg-white hover:bg-gray-100 text-gray-700 p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10 border border-gray-200"
@@ -295,4 +298,10 @@ export default function RouteTrackingMap({ routeId, userType }: RouteTrackingMap
       )}
     </>
   );
+}
+*/
+
+// Exportar componente dummy mientras se instala la dependencia
+export default function RouteTrackingMap({ routeId, userType }: { routeId?: string; userType?: string }) {
+  return <div className="w-full h-96 bg-gray-100 flex items-center justify-center rounded-lg">RouteTrackingMap - pendiente de configuración de Google Maps</div>;
 }

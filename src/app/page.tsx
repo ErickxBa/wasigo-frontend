@@ -94,7 +94,7 @@ export default function Home() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/registro">
+                <Link href="/register">
                   <Button size="lg" className="gap-2 w-full sm:w-auto">
                     Comenzar Ahora
                     <ArrowRight className="w-5 h-5" />
