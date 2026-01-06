@@ -17,7 +17,7 @@ interface Viaje {
   fecha: string;
   horaSalida: string;
   precio: number;
-  estado: 'proximo' | 'completado' | 'cancelado';
+  estado: 'programado' | 'completado' | 'cancelado';
   conductor: {
     nombre: string;
     alias: string;
@@ -43,7 +43,7 @@ export default function PassengerDashboardPage() {
       fecha: '2025-01-04',
       horaSalida: '07:00',
       precio: 2.50,
-      estado: 'proximo',
+      estado: 'programado',
       conductor: {
         nombre: 'María G.',
         alias: 'maria-g',
