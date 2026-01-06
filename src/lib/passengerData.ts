@@ -3,6 +3,8 @@ import { Ruta } from '@/data/mockData';
 // Simular delay de 2 segundos
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+export type { Ruta };
+
 export interface EstadisticasPasajero {
   viajesRealizados: number;
   proximosViajes: number;

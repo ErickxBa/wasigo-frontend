@@ -1,21 +1,17 @@
 'use client'
 
 import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Sidebar } from '@/components/layout//Sidebar';
+import { Sidebar } from '@/components/layout/Sidebar';
 import { TopBar } from '@/components/layout/TopBar';
 import { cn } from '@/lib/utils';
 
 export default function DriverLayout({
   children
 }: {
-
   children: React.ReactNode;
 }) {
-
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">

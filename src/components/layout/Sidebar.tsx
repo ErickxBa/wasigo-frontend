@@ -99,14 +99,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, mobileOpen, onMobileCl
   const getFilteredGroups = () => {
     return navGroups.map(group => ({
       ...group,
-      items: group.items.filter(item => user && item.roles.includes(user.role))
+      items: group.items.filter(item => user && user.role && item.roles.includes(user.role))
     })).filter(group => group.items.length > 0);
   };
 
   const filteredGroups = getFilteredGroups();
 
   const getRoleBadge = () => {
-    if (!user) return null;
+    if (!user || !user.role) return null;
     const roleColors: Record<string, string> = {
       pasajero: 'bg-(--info)/20 text-(--info)',
       conductor: 'bg-(--success)/20 text-(--success)',
